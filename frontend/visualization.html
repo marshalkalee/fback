@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1e1e1e;
+            color: white;
+            padding: 10px 50px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        
+        .navbar-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 30px;
+        }
+
+        .navbar-links li {
+            display: inline;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-links a:hover {
+            color: #4CAF50;
+        }
+
+        
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none; 
+        }
+
+        /* Контролы */
+        .controls {
+            margin: 20px 50px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .controls select,
+        .controls button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .controls button {
+            background-color: #082646;
+            color: white;
+            cursor: pointer;
+        }
+
+        .controls button:hover {
+            background-color: #082646;
+        }
+
+       
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #1e1e1e;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <ul class="navbar-links">
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="visualization.html">Stock</a></li>
+            <li><a href="currency.html">Currency</a></li>
+        </ul>
+    </nav>
+
+    <h1 style="margin-left: 50px;">Stock Data</h1>
+    <div class="controls">
+        <label for="stockSymbol">Select stock:</label>
+        <select id="stockSymbol">
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="GOOGL">Google (GOOGL)</option>
+            <option value="MSFT">Microsoft (MSFT)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+        </select>
+
+        <label for="chartType">Select chart type:</label>
+        <select id="chartType">
+            <option value="bar">Bar chart</option>
+            <option value="line">Line chart</option>
+            <option value="pie">Pie chart</option>
+        </select>
+
+        <button id="fetchData">Fetch Stock Data</button>
+    </div>
+
+    <div class="chart-container" id="chartContainer">
+        <canvas id="stockChart"></canvas>
+    </div>
+    <footer>
+        <p>Darya Simakhina BDA-2302</p>
+    </footer>    
+
+
+    <script>
+        let chartInstance;
+
+        document.getElementById('fetchData').addEventListener('click', () => {
+            const chartType = document.getElementById('chartType').value;
+            const stockSymbol = document.getElementById('stockSymbol').value;
+
+            
+            const stockData = {
+                AAPL: { o: 150, h: 155, l: 148, c: 153, pc: 149 },
+                GOOGL: { o: 2800, h: 2850, l: 2780, c: 2825, pc: 2790 },
+                MSFT: { o: 300, h: 305, l: 295, c: 302, pc: 298 },
+                AMZN: { o: 3450, h: 3500, l: 3420, c: 3480, pc: 3440 }
+            };
+
+            const data = stockData[stockSymbol];
+
+            const labels = ['Open', 'High', 'Low', 'Current', 'Previous Close'];
+            const values = [data.o, data.h, data.l, data.c, data.pc];
+
+            const canvas = document.getElementById('stockChart');
+            const ctx = canvas.getContext('2d');
+
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            
+            chartInstance = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels,
+                    datasets: [{
+                        label: `${stockSymbol} Stock Data`,
+                        data: values,
+                        backgroundColor: chartType === 'pie'
+                            ? ['#3498db', '#1abc9c', '#f39c12', '#e74c3c', '#9b59b6']
+                            : 'rgba(52, 152, 219, 0.6)',
+                        borderColor: chartType !== 'pie' ? '#2980b9' : null,
+                        borderWidth: chartType !== 'pie' ? 1 : 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            document.getElementById('chartContainer').style.display = 'block';
+        });
+    </script>
+
+    
+</body>
+</html>
+
+

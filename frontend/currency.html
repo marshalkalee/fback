@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency exchange</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Стили для навбар */
+    .navbar {
+        display: flex; /* Используем Flexbox */
+        align-items: center; /* Центрируем элементы по вертикали */
+        justify-content: flex-start; /* Выравниваем элементы влево */
+        background-color: #1e1e1e; /* Цвет фона */
+        color: white;
+        padding: 10px 20px;
+    }
+    
+    /* Для логотипа */
+    .navbar-brand {
+        font-size: 18px;
+        font-weight: bold;
+        margin-right: 20px; /* Промежуток между логотипом и ссылками */
+    }
+    
+    /* Ссылки */
+    .navbar-links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex; /* Устанавливаем элементы в строку */
+        gap: 20px; /* Расстояние между элементами */
+    }
+    
+    .navbar-links li {
+        display: inline; /* Убираем блочный стиль элементов */
+    }
+    
+    .navbar-links a {
+        text-decoration: none; /* Убираем подчеркивание ссылок */
+        color: white;
+        font-size: 16px;
+        transition: color 0.3s;
+    }
+    
+    .navbar-links a:hover {
+        color: #4CAF50; /* Цвет при наведении */
+    }
+    /* Контейнер графика */
+    .chart-container {
+    width: 100%; /* Устанавливаем ширину графика на всю ширину экрана */
+    max-width: none; /* Убираем максимальную ширину */
+    height: 600px; /* Высота графика */
+    margin: 20px auto; /* Отступ сверху и снизу */
+    background: white; /* Фон для графика */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* Кнопка */
+    button {
+    background-color: #082646;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+    button:hover {
+    background-color: #082646;
+}
+
+/* Заголовок */
+    h1 {
+    margin-left: 20px; /* Отступ слева */
+    margin-top: 20px; /* Отступ сверху */
+}
+
+    
+    </style>
+    </head>
+    <body>
+    
+        <nav class="navbar">
+            <ul class="navbar-links">
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="visualization.html">Stock</a></li>
+                <li><a href="currency.html">Currency</a></li>
+            </ul>
+        </nav>
+    <h1>Currency</h1>
+    <div>
+        <label for="chartType">Select chart type:</label>
+        <select id="chartType">
+            <option value="bar">Bar chart</option>
+            <option value="line">Line chart</option>
+            <option value="pie">Pie chart</option>
+        </select>
+        <button id="fetchData">Fetch currency data</button>
+    </div>
+    <div class="chart-container">
+        <canvas id="currencyChart"></canvas>
+    </div>
+    <footer>
+        <p>Darya Simakhina BDA-2302</p>
+    </footer>
+
+    <script>
+        let chartInstance;
+
+        document.getElementById('fetchData').addEventListener('click', async () => {
+            const chartType = document.getElementById('chartType').value;
+
+            try {
+                const response = await fetch('/api/currency');
+                const data = await response.json();
+
+                const rates = data.rates;
+                const labels = Object.keys(rates).slice(0, 10); 
+                const values = Object.values(rates).slice(0, 10);
+
+                const canvas = document.getElementById('currencyChart');
+                const ctx = canvas.getContext('2d');
+
+               
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                
+                chartInstance = new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Exchange Rates (Base: USD)',
+                            data: values,
+                            backgroundColor: chartType === 'pie' ? 
+                                ['#3498db', '#1abc9c', '#f39c12', '#e74c3c', '#9b59b6', '#8e44ad', '#2ecc71', '#e67e22', '#c0392b', '#7f8c8d'] : 
+                                'rgba(75, 192, 192, 0.6)',
+                            borderColor: chartType !== 'pie' ? 'rgba(75, 192, 192, 1)' : null,
+                            borderWidth: chartType !== 'pie' ? 1 : 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, 
+                        plugins: {
+                            legend: { display: true },
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching currency data:', error);
+                alert('Failed to fetch currency data.');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+     
